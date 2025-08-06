@@ -1,0 +1,33 @@
+name: Find Minimal Dependency Versions
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  find-min-versions:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12"]  # Add/remove versions here
+      fail-fast: false
+
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Install uv
+      run: pip install uv
+    
+    - name: Find minimal versions
+      run: |
+        python .github/workflows/scripts/find_min_versions.py \
+          --python-version ${{ matrix.python-version }}
+    
+    - name: Upload results
+      uses: actions/upload-artifact@v3
+      with:
+        name: min-versions-${{ matrix.python-version }}
+        path: min_versions_${{ matrix.python-version }}.txt
