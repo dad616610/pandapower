@@ -35,16 +35,16 @@ classifiers = [
     "Programming Language :: Python :: 3.12"
 ]
 dependencies = [
-    "pandas==2.3.1",
-    "networkx==3.2.1",
-    "scipy==1.13.1",
-    "numpy==2.0.2",
-    "packaging==25.0",
-    "tqdm==4.67.1",
-    "deepdiff==8.5.0",
-    "geojson==3.2.0",
-    "lxml==6.0.0",
-    "typing_extensions~=4.9",
+    "pandas==2.2.2",
+    "networkx",
+    "scipy",
+    "numpy==2.0.0",
+    "packaging",
+    "tqdm",
+    "deepdiff",
+    "geojson",
+    "lxml",
+    "typing_extensions",
 ]
 keywords = [
     "power system", "network", "analysis", "optimization", "automation", "grid", "electricity", "energy", "engineering", "simulation", "pandapower"
@@ -60,11 +60,11 @@ Download = "https://pypi.org/project/pandapower/#files"
 Changelog = "https://github.com/e2nIEE/pandapower/blob/develop/CHANGELOG.rst"
 
 [project.optional-dependencies]
-docs = ["numpydoc>=1.5.0", "matplotlib", "sphinx>=5.3.0", "sphinx_rtd_theme>=1.1.1", "sphinx-pyproject"]
-plotting = ["plotly>=3.1.1", "matplotlib", "igraph", "geopandas>=1.0"]
+docs = ["numpydoc", "matplotlib", "sphinx", "sphinx_rtd_theme", "sphinx-pyproject"]
+plotting = ["plotly", "matplotlib", "igraph", "geopandas"]
 test = ["pytest~=8.1", "pytest-xdist", "nbmake"]
-performance = ["ortools", "numba==0.60.0", "lightsim2grid==0.10.1"]
-fileio = ["xlsxwriter", "openpyxl", "cryptography", "geopandas>=1.0", "psycopg2"]
+performance = ["ortools", "numba", "lightsim2grid"]
+fileio = ["xlsxwriter", "openpyxl", "cryptography", "geopandas", "psycopg2"]
 converter = ["matpowercaseframes"]
 pgm = ["power-grid-model-io"]
 control = ["shapely"]
