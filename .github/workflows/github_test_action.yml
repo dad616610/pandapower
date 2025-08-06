@@ -3,14 +3,14 @@
 
 name: pandapower
 on:
-  push:
-    branches: '*'
-    paths-ignore:
-      - 'CHANGELOG.rst'
-  pull_request:
-    branches: '*'
-    paths-ignore:
-      - 'CHANGELOG.rst'
+  #  push:
+  # branches: '*'
+  # paths-ignore:
+  #   - 'CHANGELOG.rst'
+  #  pull_request:
+  # branches: '*'
+  # paths-ignore:
+  #  - 'CHANGELOG.rst'
 
 jobs:
   build:
