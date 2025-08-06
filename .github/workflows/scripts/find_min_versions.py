@@ -86,7 +86,8 @@ def get_direct_dependencies():
     """Get direct dependencies with their declared minimum versions"""
     try:
         # Use uv pip freeze with direct resolution
-        reqs = run_command("uv pip freeze --exclude-newer=now --resolution=lowest-direct")
+        reqs = run_command("uv lock --resolution=lowest-direct")
+        reqs = run_command("uv pip freeze")
         return {
             Requirement(line.split("==")[0]).name: line.split("==")[1]
             for line in reqs.splitlines()
