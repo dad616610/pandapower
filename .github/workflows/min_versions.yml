@@ -27,7 +27,7 @@ jobs:
           --python-version ${{ matrix.python-version }}
     
     - name: Upload results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: min-versions-${{ matrix.python-version }}
         path: min_versions_${{ matrix.python-version }}.txt
