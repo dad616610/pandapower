@@ -23,7 +23,7 @@ jobs:
     
     - name: Find minimal versions
       run: |
-        python .github/workflows/scripts/find_min_versions.py \
+        uv run --with packaging .github/workflows/scripts/find_min_versions.py \
           --python-version ${{ matrix.python-version }}
     
     - name: Upload results
