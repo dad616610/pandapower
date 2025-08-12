@@ -20,7 +20,7 @@ jobs:
     outputs:
       min: "3.9"
       max: "3.13"
-      matrix: ["3.9", "3.10", "3.11", "3.13"]
+      matrix: '["3.9", "3.10", "3.11", "3.13"]'
     steps:
       - name: Dummy job when we have just simple variables
         if: false
