@@ -13,18 +13,26 @@ on:
     paths-ignore:
       - 'CHANGELOG.rst'
 
-env:
-  PY_MIN: "3.9"
-  PY_MAX: "3.13"
-  PY_MATRIX: '["3.9", "3.10", "3.11", "3.12", "3.13"]'
-
 jobs:
+
+  py_ver:
+    runs-on: ubuntu-latest
+    outputs:
+      min: "3.9"
+      max: "3.13"
+      matrix: '["3.9", "3.10", "3.11", "3.13"]'
+    steps:
+      - name: Dummy job when we have just simple variables
+        if: false
+        run: echo
+
   build:
+    needs: py_ver
     runs-on: ubuntu-latest
     timeout-minutes: 60
     strategy:
       matrix:
-        python-version: ${{ fromJSON($PY_MATRIX) }}
+        python-version: ${{ needs.py_ver.outputs.matrix }}
         # Reminder: when removing the support of an old python version here, then don't forget to
         # remove it also in pyproject.toml 'requires-python'
         group: [ 1, 2 ]
@@ -65,13 +73,13 @@ jobs:
           path: ./coverage-${{ matrix.group }}.xml
 
   julia:
-    needs: build
+    needs: [ py_ver, build ]
     runs-on: ubuntu-latest
     timeout-minutes: 60
     continue-on-error: true
     strategy:
       matrix:
-        python-version: ${{ [ $PY_MIN ] }}
+        python-version: [ ${{ needs.py_ver.outputs.min }} ]
         # Reminder: when removing the support of an old python version here, then don't forget to
         # remove it also in pyproject.toml 'requires-python'
         group: [ 1, 2 ]
@@ -103,7 +111,7 @@ jobs:
 
   upload-coverage:
     runs-on: ubuntu-latest
-    needs: build
+    needs: [ py_ver, build ]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -134,12 +142,12 @@ jobs:
 
   warnings:
     # make pytest raise warnings as errors to see if there are warnings
-    needs: build
+    needs: [ py_ver, build ]
     runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
       matrix:
-        python-version: ${{ [ $PY_MAX ] }}
+        python-version: [ ${{ needs.py_ver.outputs.max }} ]
         group: [ 1, 2 ]
     steps:
     - uses: actions/checkout@v4
@@ -160,11 +168,11 @@ jobs:
         uv run pytest -W error --splits 2 --group ${{ matrix.group }}
 
   relying: # packages that rely on pandapower
-    needs: build
+    needs: [ py_ver, build ]
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ${{ fromJSON($PY_MATRIX) }}
+        python-version: ${{ needs.py_ver.outputs.matrix }}
     steps:
     - uses: actions/checkout@v4
     - name: Install uv
@@ -194,7 +202,7 @@ jobs:
 
   linting:
     # run flake8 and check for errors
-    needs: build
+    needs: [ py_ver, build ]
     runs-on: ubuntu-latest
     continue-on-error: true
     strategy:
@@ -226,7 +234,7 @@ jobs:
 
   postgresql:
     # for the one test to cover postgresql
-    needs: build
+    needs: [ py_ver, build ]
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -246,7 +254,7 @@ jobs:
           --health-retries 5
     strategy:
       matrix:
-        python-version: ${{ [ $PY_MAX ] }}
+        python-version: [ ${{ needs.py_ver.outputs.max }} ]
     steps:
     - name: Wait for PostgreSQL database to be ready
       run: |
@@ -292,7 +300,7 @@ jobs:
         uv run python -c "from pandapower import pp_dir; import pytest; import sys; import os; ec = pytest.main([os.path.join(pp_dir,'test','api','test_sql_io.py')]); sys.exit(ec)"
 
   tutorial_tests:
-    needs: build
+    needs: [ py_ver, build ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -316,7 +324,7 @@ jobs:
           uv run pytest --nbmake -n=auto --nbmake-timeout=900 "./tutorials"
 
   tutorial_warnings_tests:
-    needs: build
+    needs: [ py_ver, build ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -338,7 +346,7 @@ jobs:
           uv run pytest -W error --nbmake -n=auto --nbmake-timeout=900 "./tutorials"
 
   docs_check:
-    needs: build
+    needs: [ py_ver, build ]
     name: Sphinx docs check
     runs-on: ubuntu-latest
     steps:
@@ -351,11 +359,12 @@ jobs:
           docs-folder: "doc/"
 
   typing:
+    needs: py_ver
     runs-on: ubuntu-latest
     timeout-minutes: 60
     strategy:
       matrix:
-        python-version: ${{ [ $PY_MIN ] }}
+        python-version: [ ${{ needs.py_ver.outputs.min }} ]
         # Reminder: when removing the support of an old python version here, then don't forget to
         # remove it also in pyproject.toml 'requires-python'
     steps:
