@@ -3,11 +3,6 @@
 
 name: pandapower
 
-vars:
-  PY_MIN: "3.9"
-  PY_MAX: "3.13"
-  PY_MATRIX: '["3.9", "3.10", "3.11", "3.12", "3.13"]'
-
 on:
   push:
     branches: '*'
@@ -18,13 +13,18 @@ on:
     paths-ignore:
       - 'CHANGELOG.rst'
 
+env:
+  PY_MIN: "3.9"
+  PY_MAX: "3.13"
+  PY_MATRIX: '["3.9", "3.10", "3.11", "3.12", "3.13"]'
+
 jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     strategy:
       matrix:
-        python-version: ${{ fromJSON(vars.PY_MATRIX) }}
+        python-version: ${{ fromJSON(env.PY_MATRIX) }}
         # Reminder: when removing the support of an old python version here, then don't forget to
         # remove it also in pyproject.toml 'requires-python'
         group: [ 1, 2 ]
@@ -71,7 +71,7 @@ jobs:
     continue-on-error: true
     strategy:
       matrix:
-        python-version: [ ${{ vars.PY_MIN }} ]
+        python-version: [ ${{ env.PY_MIN }} ]
         # Reminder: when removing the support of an old python version here, then don't forget to
         # remove it also in pyproject.toml 'requires-python'
         group: [ 1, 2 ]
@@ -139,7 +139,7 @@ jobs:
     timeout-minutes: 30
     strategy:
       matrix:
-        python-version: [ ${{ vars.PY_MAX }} ]
+        python-version: [ ${{ env.PY_MAX }} ]
         group: [ 1, 2 ]
     steps:
     - uses: actions/checkout@v4
@@ -164,7 +164,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ${{ fromJSON(vars.PY_MATRIX) }}
+        python-version: ${{ fromJSON(env.PY_MATRIX) }}
     steps:
     - uses: actions/checkout@v4
     - name: Install uv
@@ -246,7 +246,7 @@ jobs:
           --health-retries 5
     strategy:
       matrix:
-        python-version: [ ${{ vars.PY_MAX }}  ]
+        python-version: [ ${{ env.PY_MAX }}  ]
     steps:
     - name: Wait for PostgreSQL database to be ready
       run: |
@@ -355,7 +355,7 @@ jobs:
     timeout-minutes: 60
     strategy:
       matrix:
-        python-version: [ ${{  vars.PY_MIN  }} ]
+        python-version: [ ${{  env.PY_MIN  }} ]
         # Reminder: when removing the support of an old python version here, then don't forget to
         # remove it also in pyproject.toml 'requires-python'
     steps:

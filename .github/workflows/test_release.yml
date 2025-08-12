@@ -3,15 +3,15 @@
 
 name: test
 
-vars:
-  PY_MATRIX: '["3.9", "3.10", "3.11", "3.12", "3.13"]'
-
 # Controls when the action will run.
 on:
   # Allows you to run this workflow manually from the Actions tab
   push:
     branches:
       - release/*
+
+env:
+  PY_MATRIX: '["3.9", "3.10", "3.11", "3.12", "3.13"]'
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -20,7 +20,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        python-version: ${{ fromJSON(vars.PY_MATRIX) }}
+        python-version: ${{ fromJSON(env.PY_MATRIX) }}
         os:  [ ubuntu-latest, windows-latest ]
         group: [ 1, 2 ]
 
