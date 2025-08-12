@@ -79,7 +79,7 @@ jobs:
     continue-on-error: true
     strategy:
       matrix:
-        python-version: [ ${{ needs.py_ver.outputs.min }} ]
+        python-version: [ ${{ needs.py_ver.outputs.min }}, ]
         # Reminder: when removing the support of an old python version here, then don't forget to
         # remove it also in pyproject.toml 'requires-python'
         group: [ 1, 2 ]
