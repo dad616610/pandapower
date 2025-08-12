@@ -177,7 +177,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ${{ needs.py_ver.outputs.matrix }}
+        python-version: ${{ fromJSON(needs.py_ver.outputs.matrix) }}
     steps:
     - uses: actions/checkout@v4
     - name: Install uv
