@@ -20,16 +20,16 @@ jobs:
     outputs:
       min: "3.9"
       max: "3.13"
-      # matrix: '["3.9", "3.10", "3.11", "3.13"]'
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
+      matrix: '["3.9", "3.10", "3.11", "3.13"]'
+      # matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
-      - id: set-matrix
-        run: |
-          echo "matrix={\"include\":[\"3.9\",\"3.10\",\"3.11\",\"3.12\"]}" >> $GITHUB_OUTPUT
+      # - id: set-matrix
+      #   run: |
+      #     echo "matrix={\"include\":[\"3.9\",\"3.10\",\"3.11\",\"3.12\"]}" >> $GITHUB_OUTPUT
 
-      # - name: Dummy job when we have just simple variables
-      #   if: false
-      #   run: echo
+      - name: Dummy job when we have just simple variables
+        if: false
+        run: echo
 
   build:
     needs: py_ver
@@ -37,7 +37,7 @@ jobs:
     timeout-minutes: 60
     strategy:
       matrix:
-        python-version: ${{ needs.py_ver.outputs.matrix }}
+        python-version: ${{ fromJSON(needs.py_ver.outputs.matrix) }}
         # Reminder: when removing the support of an old python version here, then don't forget to
         # remove it also in pyproject.toml 'requires-python'
         group: [ 1, 2 ]
