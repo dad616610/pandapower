@@ -10,17 +10,21 @@ on:
     branches:
       - release/*
 
-env:
-  PY_MATRIX: '["3.9", "3.10", "3.11", "3.12", "3.13"]'
-
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
+
+  py_ver:
+    runs-on: ubuntu-latest
+    outputs:
+      min: "3.9"
+      max: "3.13"
+      matrix: '["3.9", "3.10", "3.11", "3.13"]'
 
   build:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        python-version: ${{ fromJSON(env.PY_MATRIX) }}
+        python-version: ${{ needs.py_ver.outputs.matrix }}
         os:  [ ubuntu-latest, windows-latest ]
         group: [ 1, 2 ]
 
