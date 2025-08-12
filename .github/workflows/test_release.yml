@@ -2,8 +2,10 @@
 # Then, it installs pandapower from there and all dependencies and runs tests with different Python versions
 
 name: test
-env:
+
+vars:
   PY_MATRIX: '["3.9", "3.10", "3.11", "3.12", "3.13"]'
+
 # Controls when the action will run.
 on:
   # Allows you to run this workflow manually from the Actions tab
@@ -18,7 +20,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        python-version: ${{ fromJSON(env.PY_MATRIX) }}
+        python-version: ${{ fromJSON(vars.PY_MATRIX) }}
         os:  [ ubuntu-latest, windows-latest ]
         group: [ 1, 2 ]
 
