@@ -25,7 +25,7 @@ jobs:
     steps:
       - id: set-matrix
         run: |
-          echo "::set-output name=matrix::{["3.9","3.10","3.11","3.12"]}"
+          echo "matrix={[\"3.9\",\"3.10\",\"3.11\",\"3.12\"]}" >> $GITHUB_OUTPUT
 
       # - name: Dummy job when we have just simple variables
       #   if: false
