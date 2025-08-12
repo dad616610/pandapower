@@ -20,7 +20,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        python-version: ${{ fromJSON(env.PY_MATRIX) }}
+        python-version: ${{ fromJSON($PY_MATRIX) }}
         os:  [ ubuntu-latest, windows-latest ]
         group: [ 1, 2 ]
 
