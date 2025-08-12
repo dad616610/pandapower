@@ -15,12 +15,14 @@ on:
 
 jobs:
 
-  py_ver:
+  setup:
     runs-on: ubuntu-latest
     outputs:
-      min: "3.9"
-      max: "3.13"
-      matrix: '["3.9", "3.10", "3.11", "3.13"]'
+      # Reminder: when changing versions here, also change them in "test_release.yml" and in "pyproject.toml"
+      # in "requires-python" and "classifiers"
+      min_ver: "3.9"
+      max_ver: "3.13"
+      matrix_ver: '["3.9", "3.10", "3.11", "3.12", "3.13"]'
       # matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       # - id: set-matrix
@@ -32,14 +34,16 @@ jobs:
         run: echo
 
   build:
-    needs: py_ver
+    needs: setup
     runs-on: ubuntu-latest
+    outputs:
+      min_py_ver: ${{ needs.setup.outputs.min_ver }}
+      max_py_var: ${{ needs.setup.outputs.max_ver }}
+      matrix_py_ver: ${{ needs.setup.outputs.matrix_ver }}
     timeout-minutes: 60
     strategy:
       matrix:
-        python-version: ${{ fromJSON(needs.py_ver.outputs.matrix) }}
-        # Reminder: when removing the support of an old python version here, then don't forget to
-        # remove it also in pyproject.toml 'requires-python'
+        python-version: ${{ fromJSON(needs.build.outputs.matrix_ver) }}
         group: [ 1, 2 ]
     steps:
 #      - uses: actions/checkout@v4
@@ -78,15 +82,13 @@ jobs:
           path: ./coverage-${{ matrix.group }}.xml
 
   julia:
-    needs: [ py_ver, build ]
+    needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 60
     continue-on-error: true
     strategy:
       matrix:
-        python-version: [ "${{ needs.py_ver.outputs.min }}" ]
-        # Reminder: when removing the support of an old python version here, then don't forget to
-        # remove it also in pyproject.toml 'requires-python'
+        python-version: [ "${{ needs.build.outputs.min_py_ver }}" ]
         group: [ 1, 2 ]
     steps:
       - uses: actions/checkout@v4
@@ -116,7 +118,7 @@ jobs:
 
   upload-coverage:
     runs-on: ubuntu-latest
-    needs: [ py_ver, build ]
+    needs: build
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -147,12 +149,12 @@ jobs:
 
   warnings:
     # make pytest raise warnings as errors to see if there are warnings
-    needs: [ py_ver, build ]
+    needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
       matrix:
-        python-version: [ "${{ needs.py_ver.outputs.max }}" ]
+        python-version: [ "${{ needs.build.outputs.max_py_ver }}" ]
         group: [ 1, 2 ]
     steps:
     - uses: actions/checkout@v4
@@ -173,11 +175,11 @@ jobs:
         uv run pytest -W error --splits 2 --group ${{ matrix.group }}
 
   relying: # packages that rely on pandapower
-    needs: [ py_ver, build ]
+    needs: build
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ${{ fromJSON(needs.py_ver.outputs.matrix) }}
+        python-version: ${{ fromJSON(needs.build.outputs.matrix_py_ver) }}
     steps:
     - uses: actions/checkout@v4
     - name: Install uv
@@ -207,7 +209,7 @@ jobs:
 
   linting:
     # run flake8 and check for errors
-    needs: [ py_ver, build ]
+    needs: build
     runs-on: ubuntu-latest
     continue-on-error: true
     strategy:
@@ -239,7 +241,7 @@ jobs:
 
   postgresql:
     # for the one test to cover postgresql
-    needs: [ py_ver, build ]
+    needs: build
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -259,7 +261,7 @@ jobs:
           --health-retries 5
     strategy:
       matrix:
-        python-version: [ "${{ needs.py_ver.outputs.max }}" ]
+        python-version: [ "${{ needs.build.outputs.max_py_ver }}" ]
     steps:
     - name: Wait for PostgreSQL database to be ready
       run: |
@@ -305,7 +307,7 @@ jobs:
         uv run python -c "from pandapower import pp_dir; import pytest; import sys; import os; ec = pytest.main([os.path.join(pp_dir,'test','api','test_sql_io.py')]); sys.exit(ec)"
 
   tutorial_tests:
-    needs: [ py_ver, build ]
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -329,7 +331,7 @@ jobs:
           uv run pytest --nbmake -n=auto --nbmake-timeout=900 "./tutorials"
 
   tutorial_warnings_tests:
-    needs: [ py_ver, build ]
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -351,7 +353,7 @@ jobs:
           uv run pytest -W error --nbmake -n=auto --nbmake-timeout=900 "./tutorials"
 
   docs_check:
-    needs: [ py_ver, build ]
+    needs: build
     name: Sphinx docs check
     runs-on: ubuntu-latest
     steps:
@@ -364,14 +366,12 @@ jobs:
           docs-folder: "doc/"
 
   typing:
-    needs: py_ver
+    needs: setup
     runs-on: ubuntu-latest
     timeout-minutes: 60
     strategy:
       matrix:
-        python-version: [ "${{ needs.py_ver.outputs.min }}" ]
-        # Reminder: when removing the support of an old python version here, then don't forget to
-        # remove it also in pyproject.toml 'requires-python'
+        python-version: [ "${{ needs.py_ver.outputs.min_ver }}" ]
     steps:
       - uses: actions/checkout@v4
       - name: Install uv

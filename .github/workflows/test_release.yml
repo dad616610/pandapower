@@ -13,23 +13,25 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
 
-  py_ver:
+  setup:
     runs-on: ubuntu-latest
     outputs:
-      min: "3.9"
-      max: "3.13"
-      matrix: '["3.9", "3.10", "3.11", "3.13"]'
+      # Reminder: when changing versions here, also change them in "github_test_action.yml" and in "pyproject.toml"
+      # in "requires-python" and "classifiers"
+      min_ver: "3.9"
+      max_ver: "3.13"
+      matrix_ver: '["3.9", "3.10", "3.11", "3.12", "3.13"]'
     steps:
       - name: Dummy job when we have just simple variables
         if: false
         run: echo
 
   build:
-    needs: py_ver
+    needs: setup
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        python-version: ${{ fromJSON(needs.py_ver.outputs.matrix) }}
+        python-version: ${{ fromJSON(needs.setup.outputs.matrix) }}
         os:  [ ubuntu-latest, windows-latest ]
         group: [ 1, 2 ]
 
